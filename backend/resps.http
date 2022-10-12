@@ -1,0 +1,22 @@
+###
+
+POST http://127.0.0.1:8080/api/auth/token/logout/
+Content-Type: application/json
+Authorization: Token e422a165e340eaf52a7f350804b59c2e17984810
+
+# {
+#   "email": "test@user2.com",
+#   "username": "testuser2",
+#   "first_name": "dadasda",
+#   "last_name": "dadsa",
+#   "password": "Zz12345678"
+# }
+
+###
+POST http://127.0.0.1:8080/api/auth/token/login/
+Content-Type: application/json
+
+{
+  "password": "Zz12345678",
+  "email": "test@user1.com"
+}
