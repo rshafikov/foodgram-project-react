@@ -1,22 +1,36 @@
+USERS
 ###
-
-POST http://127.0.0.1:8080/api/auth/token/logout/
+POST http://127.0.0.1:8000/api/users/
 Content-Type: application/json
-Authorization: Token e422a165e340eaf52a7f350804b59c2e17984810
+# Authorization: Token 1a4c854093c2f0bc5202f63501e02ecca1b1267f
 
-# {
-#   "email": "test@user2.com",
-#   "username": "testuser2",
-#   "first_name": "dadasda",
-#   "last_name": "dadsa",
-#   "password": "Zz12345678"
-# }
-
+{
+  "email": "test@user14.com",
+  "username": "testuser14",
+  "first_name": "dadasda",
+  "last_name": "dadsa",
+  "password": "Zz12345678"
+}
 ###
-POST http://127.0.0.1:8080/api/auth/token/login/
+POST http://127.0.0.1:8000/api/auth/token/login/
 Content-Type: application/json
 
 {
-  "password": "Zz12345678",
-  "email": "test@user1.com"
+  "password": "Zz123456789",
+  "email": "test@user3.com"
 }
+###
+POST http://127.0.0.1:8000/api/users/set_password/
+Content-Type: application/json
+Authorization: Token 1a4c854093c2f0bc5202f63501e02ecca1b1267f
+
+{
+  "new_password": "Zz123456789",
+  "current_password": "Zz12345678"
+}
+###
+TAGS
+###
+GET http://127.0.0.1:8000/api/tags/
+Content-Type: application/json
+Authorization: Token 1a4c854093c2f0bc5202f63501e02ecca1b1267f

@@ -21,7 +21,33 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'djoser',
     'users',
+    'api',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'PAGE_SIZE': 5,
+    # 'DEFAULT_PAGINATION_CLASS': 'api.pagination.Pagination',
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=15),
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=15),
+}
+
+DJOSER = {
+    'HIDE_USERS': False,
+    'LOGIN_FIELD': 'email',
+    'SERIALIZERS': {
+        'user_create': 'api.serializers.CustomUserSerializer',
+        'user': 'api.serializers.CustomUserSerializer',
+    },
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -52,30 +78,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
-
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
-    ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-    ],
-    # 'DEFAULT_PAGINATION_CLASS': 'api.pagination.Pagination',
-}
-
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(days=15),
-    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=15),
-}
-
-DJOSER = {
-    'HIDE_USERS': False,
-    'LOGIN_FIELD': 'email',
-    'SERIALIZERS': {
-        'user_create': 'users.serializers.CustomUserSerializer',
-        'user': 'users.serializers.CustomUserSerializer',
-    },
-}
 
 DATABASES = {
     'default': {
