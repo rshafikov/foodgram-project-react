@@ -1,8 +1,8 @@
 USERS
 ###
-POST http://127.0.0.1:8000/api/users/
+GET http://127.0.0.1:8000/api/users/
 Content-Type: application/json
-# Authorization: Token 1a4c854093c2f0bc5202f63501e02ecca1b1267f
+Authorization: Token 1a4c854093c2f0bc5202f63501e02ecca1b1267f
 
 {
   "email": "test@user14.com",
@@ -28,9 +28,13 @@ Authorization: Token 1a4c854093c2f0bc5202f63501e02ecca1b1267f
   "new_password": "Zz123456789",
   "current_password": "Zz12345678"
 }
-###
+
 TAGS
 ###
 GET http://127.0.0.1:8000/api/tags/
 Content-Type: application/json
 Authorization: Token 1a4c854093c2f0bc5202f63501e02ecca1b1267f
+
+Ingredients
+###
+GET http://127.0.0.1:8000/api/ingredients/?name=Порошок
