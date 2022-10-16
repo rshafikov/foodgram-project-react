@@ -8,6 +8,8 @@ __pycache__/
 
 # vscode
 .vscode
+resps.http
+.*
 
 # Distribution / packaging
 .Python
