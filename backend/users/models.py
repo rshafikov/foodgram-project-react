@@ -36,13 +36,23 @@ class CustomUser(AbstractUser):
 
 
 class Follow(models.Model):
-    follower = models.ForeignKey(
+    ''' user - кто подписывается, following - на кого'''
+    user = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
         related_name='followers',
     )
-    follow = models.ForeignKey(
+    following = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
-        related_name='follows',
+        related_name='following',
     )
+
+    def __str__(self):
+        return f'{self.following.username} подписан на {self.user.username}'
+
+
+# from users.models import CustomUser, Follow; \
+# u1 = CustomUser.objects.get(id=1); \
+# u2 = CustomUser.objects.get(id=2); \
+# u3 = CustomUser.objects.get(id=3)

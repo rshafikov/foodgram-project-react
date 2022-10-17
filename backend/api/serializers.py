@@ -1,14 +1,19 @@
 from djoser.serializers import UserCreateSerializer
 from users.models import CustomUser
 from .models import Tag, Ingredient
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, SerializerMethodField, Field
 
 
 class CustomUserSerializer(UserCreateSerializer):
+    is_subscribed = SerializerMethodField(read_only=True)
+
     class Meta:
         model = CustomUser
-        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'password')
+        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'password', 'is_subscribed')
 
+    def get_is_subscribed(self, obj):
+        user = self.context['request'].user
+        return obj.following.filter(user=user).exists()
 
 class TagSerializer(ModelSerializer):
     class Meta:
@@ -22,15 +27,19 @@ class IngredientSerializer(ModelSerializer):
         fields = ('id', 'name', 'measurement_unit')
 
 
-class SubscribeSerilizer(ModelSerializer):
-    pass
+# class SubscribeSerilizer:
+#     pass
 
 
 class FollowSerializer(ModelSerializer):
-    is_subscribed = SubscribeSerilizer()
+    is_subscribed = SerializerMethodField()
     # recipes = 
     # recipes_count = 
 
     class Meta:
         model = CustomUser
         fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed')
+
+    def get_is_subscribed(self, obj):
+        user = self.context['request'].user
+        return obj.following.filter(user=user).exists()

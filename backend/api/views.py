@@ -1,36 +1,50 @@
 from djoser.views import UserViewSet
-from users.models import CustomUser
+from users.models import CustomUser, Follow
 from .models import Tag, Ingredient
-from .serializers import TagSerializer, IngredientSerializer
-from rest_framework.permissions import IsAuthenticated
+from .serializers import FollowSerializer, TagSerializer, IngredientSerializer
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
-
+from django.shortcuts import get_object_or_404
+from rest_framework import status
 
 
 class UsersViewSet(UserViewSet):
     queryset = CustomUser.objects.all()
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AllowAny, )
 
-    @action(detail=False, methods=['get'])
-    def subscriptions(self):
-        subs = self.request.user.follows.all()
-        page = self.paginate_queryset(subs)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def subscriptions(self, request):
+        follows = CustomUser.objects.filter(following__user=request.user)
+        pages = self.paginate_queryset(follows)
+        if pages:
+            serializer = FollowSerializer(pages, many=True, context={'request': request})
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(subs, many=True)
-        return Response(serializer.data)
+        serializer = FollowSerializer(follows, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['post', 'delete'])
-    def subscribe(self):
-        user = self.request.user
-        follow = self.kwargs.get('pk')
-        print(follow)
+    @action(detail=True, methods=['post', 'delete'], permission_classes=[IsAuthenticated])
+    def subscribe(self, request, id):
+        user = request.user
+        follow_to = get_object_or_404(CustomUser, id=id)
+        subscription = Follow.objects.filter(user=user, following=follow_to)
+        if self.request.method == 'POST' and user.username != follow_to.username:
+            Follow.objects.get_or_create(user=user, following=follow_to)
+            serializer = FollowSerializer(follow_to, )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if self.request.method == 'DELETE' and subscription.exists():
+            subscription.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(
+            {'error':
+                'Вы не подписаны на данного пользователя '
+                'или подписываетесь на себя!'
+            },
+            status=status.HTTP_400_BAD_REQUEST)
 
 
 class TagViewSet(ReadOnlyModelViewSet):
