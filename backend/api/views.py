@@ -1,10 +1,10 @@
 from djoser.views import UserViewSet
 from users.models import CustomUser, Follow
-from .models import Tag, Ingredient
-from .serializers import FollowSerializer, TagSerializer, IngredientSerializer
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from .models import Tag, Ingredient, Recipe
+from .serializers import FollowSerializer, RecipeSerializer, TagSerializer, IngredientSerializer
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
@@ -34,7 +34,7 @@ class UsersViewSet(UserViewSet):
         subscription = Follow.objects.filter(user=user, following=follow_to)
         if self.request.method == 'POST' and user.username != follow_to.username:
             Follow.objects.get_or_create(user=user, following=follow_to)
-            serializer = FollowSerializer(follow_to, )
+            serializer = FollowSerializer(follow_to, context={'request': request})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         if self.request.method == 'DELETE' and subscription.exists():
             subscription.delete()
@@ -50,6 +50,7 @@ class UsersViewSet(UserViewSet):
 class TagViewSet(ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    pagination_class = None
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
@@ -58,3 +59,9 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     pagination_class = None
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('name', ) 
+
+
+class RecipeViewSet(ModelViewSet):
+    queryset = Recipe.objects.all()
+    serializer_class = RecipeSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, )

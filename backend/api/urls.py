@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import UsersViewSet, TagViewSet, IngredientViewSet
+from .views import UsersViewSet, TagViewSet, IngredientViewSet, RecipeViewSet
 from rest_framework import routers
 # import djoser.urls.authtoken
 
@@ -21,6 +21,11 @@ router_v1.register(
     'ingredients',
     IngredientViewSet,
     basename='ingredients'
+)
+router_v1.register(
+    'recipes',
+    RecipeViewSet,
+    basename='recipes'
 )
 
 urlpatterns = [
