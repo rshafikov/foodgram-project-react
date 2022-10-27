@@ -1,6 +1,8 @@
 from django.db import models
 from users.models import CustomUser
 from django.core.validators import MinValueValidator
+from django.db.models import UniqueConstraint
+
 
 class Tag(models.Model):
     name = models.CharField(
@@ -67,7 +69,7 @@ class Recipe(models.Model):
         validators=[MinValueValidator(1, 'Значение не может быть меньше 1')],
         verbose_name='Время готовки в минутах',
     )
-    description = models.TextField(null=True)
+    text = models.TextField(null=True)
 
     class Meta:
         ordering = ('-pub_date',)
@@ -102,4 +104,55 @@ class IngredientAmount(models.Model):
 
 
     def str(self):
-        return f'{self.ingredient} {self.recipe}' 
+        return f'{self.ingredient} {self.recipe}'
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(
+        CustomUser,
+        related_name='favorites',
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь'
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        related_name='favorites',
+        on_delete=models.CASCADE,
+        verbose_name='Избранный рецепт'
+    )
+    added = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата добавления в избранное'
+    )
+
+    class Meta:
+        verbose_name = 'Избранное'
+        UniqueConstraint(fields=['recipe', 'user'], name='favorite_unique')
+
+    def __str__(self):
+        return f"{self.user} has favorites: {self.recipe.name}"
+
+
+class ShoppingCart(models.Model):
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='user_shopping_list',
+        verbose_name='Пользователь'
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='purchases',
+        verbose_name='Покупка'
+        )
+    added = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата добавления в список покупок'
+    )
+
+    class Meta:
+        verbose_name = 'Покупки'
+
+    def __str__(self):
+        return f'In {self.user} shopping list: {self.recipe}'
