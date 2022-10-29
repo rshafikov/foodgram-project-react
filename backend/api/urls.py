@@ -1,6 +1,8 @@
-from django.urls import path, include
-from .views import UsersViewSet, TagViewSet, IngredientViewSet, RecipeViewSet
+from django.urls import include, path
 from rest_framework import routers
+
+from .views import IngredientViewSet, RecipeViewSet, TagViewSet, UsersViewSet
+
 # import djoser.urls.authtoken
 
 app_name = 'api'

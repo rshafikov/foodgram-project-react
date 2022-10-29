@@ -1,42 +1,57 @@
-from djoser.views import UserViewSet
-from users.models import CustomUser, Follow
-from .models import Tag, Ingredient, Recipe, ShoppingCart, IngredientAmount, Favorite
-from .serializers import FollowSerializer, RecipeWriteSerializer, TagSerializer, IngredientSerializer, RecipeReadSerializer, FavAndCartSerializer, IngredientListSerializer
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
-from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework import status
-from django_filters.rest_framework import DjangoFilterBackend
-from django.shortcuts import get_object_or_404, HttpResponse
-
-
 import datetime
+
+from django.shortcuts import HttpResponse, get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from djoser.views import UserViewSet
+from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.permissions import (AllowAny, IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+
+from users.models import CustomUser, Follow
+
+from .models import (Favorite, Ingredient, IngredientAmount, Recipe,
+                     ShoppingCart, Tag)
+from .serializers import (FavAndCartSerializer, FollowSerializer,
+                          IngredientListSerializer, RecipeReadSerializer,
+                          RecipeWriteSerializer, TagSerializer)
 
 
 class UsersViewSet(UserViewSet):
     queryset = CustomUser.objects.all()
     permission_classes = (AllowAny, )
 
-    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    @action(
+        detail=False,
+        methods=['get'],
+        permission_classes=[IsAuthenticated]
+    )
     def subscriptions(self, request):
         follows = CustomUser.objects.filter(following__user=request.user)
         pages = self.paginate_queryset(follows)
         if pages:
-            serializer = FollowSerializer(pages, many=True, context={'request': request})
+            serializer = FollowSerializer(
+                pages, many=True, context={'request': request})
             return self.get_paginated_response(serializer.data)
 
         serializer = FollowSerializer(follows, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['post', 'delete'], permission_classes=[IsAuthenticated])
+    @action(
+        detail=True,
+        methods=['post', 'delete'],
+        permission_classes=[IsAuthenticated]
+    )
     def subscribe(self, request, id):
         user = request.user
         follow_to = get_object_or_404(CustomUser, id=id)
         subscription = Follow.objects.filter(user=user, following=follow_to)
-        if self.request.method == 'POST' and user.username != follow_to.username:
+        if request.method == 'POST' and user.username != follow_to.username:
             Follow.objects.get_or_create(user=user, following=follow_to)
-            serializer = FollowSerializer(follow_to, context={'request': request})
+            serializer = FollowSerializer(
+                follow_to, context={'request': request})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         if self.request.method == 'DELETE' and subscription.exists():
             subscription.delete()
@@ -44,8 +59,7 @@ class UsersViewSet(UserViewSet):
         return Response(
             {'error':
                 'Вы не подписаны на данного пользователя '
-                'или подписываетесь на себя!'
-            },
+                'или подписываетесь на себя!'},
             status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -60,7 +74,7 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     serializer_class = IngredientListSerializer
     pagination_class = None
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('name', ) 
+    filterset_fields = ('name', )
 
 
 class RecipeViewSet(ModelViewSet):
@@ -120,15 +134,17 @@ class RecipeViewSet(ModelViewSet):
                 }
             else:
                 shopping_list[name]['amount'] += amount
-        main_list = ([f"* {item}:{value['amount']}"
-                    f"{value['measurement_unit']}\n"
-                    for item, value in shopping_list.items()])
+        main_list = ([
+            f"* {item}:{value['amount']}"
+            f"{value['measurement_unit']}\n"
+            for item, value in shopping_list.items()]
+        )
         today = datetime.date.today()
         main_list.append(f'\n aboba, {today.year}')
         response = HttpResponse(main_list, 'Content-Type: text/plain')
         response['Content-Disposition'] = 'attachment; filename="BuyList.txt"'
         return response
-    
+
     @action(
         detail=True,
         methods=['post', 'delete'],

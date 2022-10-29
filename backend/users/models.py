@@ -22,14 +22,13 @@ class CustomUser(AbstractUser):
     )
 
     class Meta:
-        ordering = ('role',)
+        ordering = ('role', )
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 
     @property
     def is_admin(self):
         return self.is_staff or self.is_superuser or self.role == self.ADMIN
-
 
     def __str__(self):
         return self.username
@@ -50,9 +49,3 @@ class Follow(models.Model):
 
     def __str__(self):
         return f'{self.following.username} подписан на {self.user.username}'
-
-
-# from users.models import CustomUser, Follow; \
-# u1 = CustomUser.objects.get(id=1); \
-# u2 = CustomUser.objects.get(id=2); \
-# u3 = CustomUser.objects.get(id=3)

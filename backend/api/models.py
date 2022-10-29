@@ -1,33 +1,34 @@
-from django.db import models
-from users.models import CustomUser
 from django.core.validators import MinValueValidator
+from django.db import models
 from django.db.models import UniqueConstraint
+
+from users.models import CustomUser
 
 
 class Tag(models.Model):
     name = models.CharField(
-        verbose_name = 'Имя тега',
-        max_length = 200,
+        verbose_name='Имя тега',
+        max_length=200,
     )
     color = models.CharField(
-        verbose_name = 'Цвет',
-        max_length = 7, 
+        verbose_name='Цвет',
+        max_length=7,
     )
     slug = models.SlugField(
         unique=True,
         max_length=200,
     )
-    
+
+
 class Ingredient(models.Model):
     name = models.CharField(
-        verbose_name = 'Имя ингредиента',
-        max_length = 200,
+        verbose_name='Имя ингредиента',
+        max_length=200,
     )
     measurement_unit = models.CharField(
-        verbose_name = 'Единица измерения',
-        max_length = 200,
+        verbose_name='Единица измерения',
+        max_length=200,
     )
-
 
     class Meta:
         verbose_name = 'Ингредиент'
@@ -39,7 +40,7 @@ class Ingredient(models.Model):
 
 class Recipe(models.Model):
     author = models.ForeignKey(
-    CustomUser,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='recipes',
     )
@@ -78,7 +79,7 @@ class Recipe(models.Model):
 
     def str(self):
         return self.name
-    
+
 
 class IngredientAmount(models.Model):
     recipe = models.ForeignKey(
@@ -101,7 +102,6 @@ class IngredientAmount(models.Model):
     class Meta:
         verbose_name = 'Количество ингредиента'
         verbose_name_plural = 'Количество ингредиентов'
-
 
     def str(self):
         return f'{self.ingredient} {self.recipe}'
@@ -145,7 +145,7 @@ class ShoppingCart(models.Model):
         on_delete=models.CASCADE,
         related_name='purchases',
         verbose_name='Покупка'
-        )
+    )
     added = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата добавления в список покупок'
