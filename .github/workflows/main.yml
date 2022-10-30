@@ -6,9 +6,9 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.9
     - name: Dependecies and tests
@@ -25,18 +25,18 @@ jobs:
       needs: tests
       steps:
         - name: Check out the repo
-          uses: actions/checkout@v2 
+          uses: actions/checkout@v3 
         - name: Set up Docker Buildx
-          uses: docker/setup-buildx-action@v1 
+          uses: docker/setup-buildx-action@v2
         - name: Login to Docker 
-          uses: docker/login-action@v1 
+          uses: docker/login-action@v2
           with:
             username: ${{ secrets.DOCKER_USERNAME }} 
             password: ${{ secrets.DOCKER_PASSWORD }} 
         - name: Push to Docker Hub
-          uses: docker/build-push-action@v2 
+          uses: docker/build-push-action@v3
           with:
-            context: foodgram-backend
+            context: backend
             push: true
             tags: ${{ secrets.DOCKER_USERNAME }}/foodgram-backend
 
@@ -53,6 +53,7 @@ jobs:
           script: |
             sudo docker compose stop
             sudo docker compose rm backend
+            sudo docker image rm ${{ secrets.DOCKER_USERNAME }}/foodgram-backend
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram-backend
             touch .env
             echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
@@ -62,6 +63,8 @@ jobs:
             echo DB_HOST=${{ secrets.DB_HOST }} >> .env
             echo DB_PORT=${{ secrets.DB_PORT }} >> .env
             sudo docker compose up -d
+            # sudo docker compose exec backend python3 manage.py migrate
+            sudo docker compose exec backend python3 manage.py collectstatic
 
   send_message:
     runs-on: ubuntu-latest
@@ -72,4 +75,4 @@ jobs:
       with:
         to: ${{ secrets.TELEGRAM_MY_ID }}
         token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        message: test of ${{ github.workflow }} + ${{ inputs.deploy_target }} + ${{ github.actor }}
+        message: test of ${{ github.workflow }} created by ${{ github.actor }}

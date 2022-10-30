@@ -1,7 +1,6 @@
 from djoser.serializers import UserCreateSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
-
 from users.models import CustomUser
 
 from .models import (Favorite, Ingredient, IngredientAmount, Recipe,
@@ -202,13 +201,12 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         return data
 
     def to_representation(self, instance):
-        data = RecipeReadSerializer(
+        return RecipeReadSerializer(
             instance,
             context={
                 'request': self.context.get('request')
             }
         ).data
-        return data
 
 
 class FavAndCartSerializer(serializers.ModelSerializer):

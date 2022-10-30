@@ -9,7 +9,6 @@ from rest_framework.permissions import (AllowAny, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-
 from users.models import CustomUser, Follow
 
 from .models import (Favorite, Ingredient, IngredientAmount, Recipe,
