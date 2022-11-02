@@ -3,8 +3,6 @@ from rest_framework import routers
 
 from .views import IngredientViewSet, RecipeViewSet, TagViewSet, UsersViewSet
 
-# import djoser.urls.authtoken
-
 app_name = 'api'
 
 router_v1 = routers.DefaultRouter()

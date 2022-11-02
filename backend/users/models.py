@@ -47,5 +47,9 @@ class Follow(models.Model):
         related_name='following',
     )
 
+    class Meta:
+        verbose_name = 'Подписчик'
+        verbose_name_plural = 'Подписчики'
+
     def __str__(self):
         return f'{self.following.username} подписан на {self.user.username}'
