@@ -117,13 +117,13 @@ class IngredientAmount(models.Model):
 class Favorite(models.Model):
     user = models.ForeignKey(
         CustomUser,
-        related_name='favorites',
+        related_name='favorite_recipe',
         on_delete=models.CASCADE,
         verbose_name='Пользователь'
     )
     recipe = models.ForeignKey(
         Recipe,
-        related_name='favorites',
+        related_name='is_favorite',
         on_delete=models.CASCADE,
         verbose_name='Избранный рецепт'
     )
