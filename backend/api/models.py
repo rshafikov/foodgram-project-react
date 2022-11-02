@@ -18,6 +18,13 @@ class Tag(models.Model):
         max_length=200,
     )
 
+    class Meta:
+        verbose_name = 'Тэг'
+        verbose_name_plural = 'Тэги'
+
+    def __str__(self):
+        return f'{self.name}:{self.color}'
+
 
 class Ingredient(models.Model):
     name = models.CharField(
@@ -31,6 +38,7 @@ class Ingredient(models.Model):
 
     class Meta:
         verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
         ordering = ['name']
 
     def __str__(self):
@@ -126,6 +134,7 @@ class Favorite(models.Model):
 
     class Meta:
         verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранное'
         UniqueConstraint(fields=['recipe', 'user'], name='favorite_unique')
 
     def __str__(self):
@@ -151,7 +160,8 @@ class ShoppingCart(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Покупки'
+        verbose_name = 'Покупка'
+        verbose_name_plural = 'Покупки'
 
     def __str__(self):
         return f'In {self.user} shopping list: {self.recipe}'
