@@ -2,7 +2,7 @@ from csv import reader
 
 from django.core.management.base import BaseCommand
 
-from api.models import Ingredient  # isort:skip
+from api.models import Ingredient, Tag  # isort:skip
 
 
 class Command(BaseCommand):
@@ -20,3 +20,14 @@ class Command(BaseCommand):
                     )
         self.stdout.write(
             self.style.SUCCESS('Ingredients has been loaded succesfully'))
+        with open(
+                'api/data/tags.csv', 'r',
+                encoding='UTF-8'
+        ) as tags:
+            for row in reader(tags):
+                if len(row) == 3:
+                    Tag.objects.get_or_create(
+                        name=row[0], color=row[1], slug=row[2]
+                    )
+        self.stdout.write(
+            self.style.SUCCESS('Tags has been loaded succesfully'))

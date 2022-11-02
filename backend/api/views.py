@@ -5,7 +5,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.permissions import (AllowAny, IsAuthenticated,
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
@@ -20,23 +21,20 @@ from .serializers import (FavAndCartSerializer, FollowSerializer,
 
 class UsersViewSet(UserViewSet):
     queryset = CustomUser.objects.all()
-    permission_classes = (AllowAny, )
+    permission_classes = (IsAuthenticated, )  # Кастомный пермишен нужен
+    pagination_class = PageNumberPagination
 
     @action(
         detail=False,
         methods=['get'],
-        permission_classes=[IsAuthenticated]
+        permission_classes=[IsAuthenticated],
     )
     def subscriptions(self, request):
         follows = CustomUser.objects.filter(following__user=request.user)
         pages = self.paginate_queryset(follows)
-        if pages:
-            serializer = FollowSerializer(
-                pages, many=True, context={'request': request})
-            return self.get_paginated_response(serializer.data)
-
-        serializer = FollowSerializer(follows, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = FollowSerializer(
+            pages, many=True, context={'request': request})
+        return self.get_paginated_response(serializer.data)
 
     @action(
         detail=True,
@@ -134,14 +132,16 @@ class RecipeViewSet(ModelViewSet):
             else:
                 shopping_list[name]['amount'] += amount
         main_list = ([
-            f"* {item}:{value['amount']}"
-            f"{value['measurement_unit']}\n"
+            f"✅ {item}: {value['amount']}"
+            f" ({value['measurement_unit']})\n"
             for item, value in shopping_list.items()]
         )
         today = datetime.date.today()
-        main_list.append(f'\n aboba, {today.year}')
+        main_list.append(
+            f'\n 🌭 FoodGram, '
+            f'{today.day}-{today.month}-{today.year}')
         response = HttpResponse(main_list, 'Content-Type: text/plain')
-        response['Content-Disposition'] = 'attachment; filename="BuyList.txt"'
+        response['Content-Disposition'] = 'attachment; filename="ShopList.txt"'
         return response
 
     @action(

@@ -9,7 +9,8 @@ services:
       - ./.env
 
   backend:
-    image: rshafikov/foodgram-backend:latest
+    # image: rshafikov/foodgram-backend:latest
+    build: ../backend/.
     restart: always
     volumes:
       - static:/app/static/
@@ -20,7 +21,8 @@ services:
       - ./.env
 
   frontend:
-    image: rshafikov/foodgram-frontend:latest
+    # image: rshafikov/foodgram-frontend:latest
+    build: ../frontend/.
     volumes:
         - ../frontend/:/app/result_build/
 
